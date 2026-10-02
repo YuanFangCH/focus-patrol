@@ -3,7 +3,7 @@ import { Request } from 'express';
 
 /**
  * 本机/局域网 IP 白名单守卫
- * 用于管理接口(如 /api/admin/*),只允许管理员在本机或局域网内调用,公网不可达。
+ * 用于管理接口(如 /api/admin/*),只允许本机或局域网请求调用。
  */
 @Injectable()
 export class LocalIpGuard implements CanActivate {

@@ -14,7 +14,7 @@ violation snapshots in the report.
 
 - Never commit `.env` files, SQLite databases, uploaded images, logs, or backups.
 - Configure AI provider keys through the admin panel or local environment only.
-- Replace the placeholder `JWT_SECRET` and `JWT_REFRESH_SECRET` values before any
-  network-facing deployment.
+- Replace the placeholder `JWT_SECRET` and `JWT_REFRESH_SECRET` values before
+  exposing the service beyond a local development machine.
 - If a credential is exposed, rotate it immediately and invalidate existing
-  sessions before continuing deployment.
+  sessions before continuing.

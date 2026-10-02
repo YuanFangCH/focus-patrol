@@ -18,12 +18,11 @@ npm ci
 Copy-Item .env.example .env   # 可选；不建 .env 时使用默认值
 npm run start:dev             # 开发模式（热重载）
 
-# 生产模式
+# 构建校验
 npm run build
-npm run start:prod            # 等价于 node dist/main.js
 ```
 
-启动后访问 `http://localhost:3001/api`。改完后端代码后必须重新构建再重启生产进程（`npm run build`）。
+启动后访问 `http://localhost:3001/api`。
 
 ## 环境变量
 
@@ -79,7 +78,7 @@ src/
 | 社交 | `/social/requests`、`/social/friends` | 好友申请与关系 |
 | 通知 | `GET /notifications`、`POST /notifications/:id/read`、`POST /notifications/read-all` | 通知中心 |
 | 在线 | `POST /track/ping`、`POST /track/leave`、`GET /track/online` | 在线状态心跳 |
-| 管理 | `/admin/users`、`/admin/stats`、`/admin/processes/*`、`/admin/ai-config/*` | 仅本机/局域网可访问 |
+| 管理 | `/admin/users`、`/admin/stats`、`/admin/ai-config/*` | 仅本机/局域网可访问 |
 
 ## 建号
 
@@ -91,7 +90,7 @@ node scripts/create-user.js --count 3 --json          # 输出 JSON 方便分发
 node scripts/create-user.js --url http://localhost:3001
 ```
 
-脚本会调用本机管理接口 `POST /api/admin/users`。公网经反代访问 `/api/admin/*` 会被 `proxy.js` 直接返回 `403`。
+脚本会调用仅允许本机/局域网访问的管理接口 `POST /api/admin/users`。
 
 ## 测试与验证
 
@@ -102,7 +101,6 @@ node test-m2.mjs                 # M2 巡查全链路
 node test-m3.mjs                 # M3 荣誉 + 社交 + 通知 + 在线
 node e2e-patrol.mjs              # 端到端 multipart 巡查
 node verify-admin.cjs            # 管理接口完整验证（建号/禁用/删除级联）
-node verify-proxy-snapshot.cjs   # 违纪快照经 8888 反代全链路
 ```
 
 辅助脚本：`_verify-stats.cjs` 直接读 SQLite 统计会话与巡查数据，`_test-localrule.cjs` 验证本地规则违纪帧留档，`test-insert.js` 检查 TypeORM 写入。
@@ -113,5 +111,6 @@ node verify-proxy-snapshot.cjs   # 违纪快照经 8888 反代全链路
 - **改了 SQLite 文件不生效**：SQL.js 运行期间以内存库为准，先停后端再改文件，或统一走接口修改。
 - **AI 判定一直 `unknown`**：`AI_PROVIDER` 仍为 `mock`，或 `ai_configs` / 环境变量里没有可用 key；查看后端日志中的可用通道过滤结果。
 - **快照接口返回 JSON 而不是图片**：确认 `TransformInterceptor` 放行了 `StreamableFile`。
-- **生产安全**：务必替换 `JWT_SECRET`、`JWT_REFRESH_SECRET`，并配置 `CORS_ORIGINS` 白名单。
+- **安全提示**：在共享或联网环境使用前，务必替换 `JWT_SECRET`、`JWT_REFRESH_SECRET`，并按需配置 `CORS_ORIGINS` 白名单。
+- **运行范围**：仓库不提供部署、反向代理、进程守护、备份或生产运行说明。
 - **许可证**：MIT，见仓库根目录 `LICENSE`。

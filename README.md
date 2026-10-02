@@ -14,14 +14,16 @@
 - [TECHNICAL.md](./TECHNICAL.md)：全技术文档，模块、数据表与判定链路
 - [backend/README.md](./backend/README.md)：后端启动、环境变量、接口与测试
 - [frontend/README.md](./frontend/README.md)：前端页面、巡查链路与构建排错
-- [scripts/README.md](./scripts/README.md)：一键启动、任务计划与备份脚本
-- [installers/README.md](./installers/README.md)：安装包目录约定
+
+## 运行范围
+
+本仓库只保留应用源码与有限的开发参考说明，**不包含任何本地部署、反向代理、进程守护、自动备份、公网发布或生产运行资料**。
 
 ## 技术栈
 
 - **前端**:Next.js 14 (App Router) + React 18 + TypeScript + Tailwind CSS v3 + zustand + PWA
 - **后端**:NestJS 10 + TypeORM + JWT (access 15min / refresh 30d 旋转)
-- **数据库**:默认 SQL.js(WASM,零安装零编译,文件 `backend/data/aidushu.sqlite`);生产切 PostgreSQL(改 `DB_TYPE=postgres`)
+- **数据库**:默认 SQL.js(WASM,零安装零编译,文件 `backend/data/aidushu.sqlite`);可选 PostgreSQL(改 `DB_TYPE=postgres`)
 - **AI 判定**:抽象层 `IFocusVisionProvider`,开发期 Mock 厂商
 
 ## 快速开始
@@ -31,7 +33,7 @@
 cd backend
 cp .env.example .env        # 可选；Windows 可用 Copy-Item
 npm ci
-npm run start:dev           # 或 npm run build && npm run start:prod
+npm run start:dev
 
 # 2. 前端 (端口 3000)
 cd frontend
@@ -53,7 +55,6 @@ npm run dev
 
 见各目录 `.env.example`:
 - `backend/.env.example`:DB_TYPE / JWT_SECRET / AI_PROVIDER
-- `frontend/.env.production.example`: 同源部署时的 `NEXT_PUBLIC_API_BASE`
 
 ## 目录结构
 
@@ -106,48 +107,10 @@ frontend/
 - [x] M1 认证 + 番茄钟(uid 登录、会话落库、得分结算)
 - [x] M2 AI 巡查(本地指纹预筛 + /patrols/evaluate + 违纪快照 + 督学官 UI)
 - [x] M3 荣誉 + 社交(加分升段 + 勋章 + 好友互关 + 在线心跳 + 通知)
-- [x] M4 本机部署 + 安全加固(反代 + JWT 强密钥 + CORS 白名单 + 备份)
-- [x] M4.5 管理面板(用户管理 + 数据查看, 本机 3002)
-- [ ] M5 SakuraFrp 公网穿透(需用户操作 SakuraLauncher 建隧道)
 
-## 管理面板
+## 管理接口
 
-```bash
-# 独立进程(仅本机): scripts/start-all.bat 已含,或手动:
-cd frontend && npx next start -H 127.0.0.1 -p 3002
-# 浏览器打开 http://127.0.0.1:3002/admin
-# 功能: 全局统计 / 用户搜索分页 / 建号(批量生成 uid) / 详情(会话·巡查·勋章聚合) / 禁用启用(即时踢线) / 删除(级联清理)
-# 安全: LocalIpGuard 仅本机; proxy.js 对 /api/admin/* 403; middleware 拦非本机 Host 访问 /admin
-```
-
-## 本机部署(SakuraFrp 方案 A)
-
-```bash
-# 四服务:
-#   后端 node dist/main.js           → 3001
-#   前端 node node_modules/... next start -p 3000 → 3000
-#   管理面板 next start -H 127.0.0.1 -p 3002     → 3002(仅本机)
-#   反代 node proxy.js               → 127.0.0.1:8888 (/api/*→3001 其余→3000, /api/admin/* 403)
-# 一键启动(含崩溃自愈): scripts/start-all.bat
-# 任务计划注册(管理员): scripts/register-tasks.bat
-# 每日备份(保留7份):    scripts/backup.bat (或任务计划 aidushu-backup 每日 04:00)
-
-# SakuraFrp 建站(用户操作):
-# 1. SakuraLauncher 登录 → 创建 TCP 隧道
-# 2. 节点选非内地(香港, 免备案; TCP 隧道穿透 HTTP 禁止内地节点)
-# 3. 本地 IP 127.0.0.1, 本地端口 8888, 开「自动 HTTPS」
-# 4. 启动后访问 https://节点域名:端口
-# 5. 证书告警按官方 frpc/ssl.html 配置; 启动器「安装为系统服务」开机自启
-# 安全: 建号仅限本机直连 3001(/api/admin/* 经隧道一律 403); CORS 可用 CORS_ORIGINS 白名单
-```
-
-## 生产部署(后续, 备选)
-
-```bash
-# docker-compose 四服务(api/postgres/redis/adminer)需装 Docker Desktop
-# 数据库切 PG:DB_TYPE=postgres + DATABASE_URL
-# 前端可部署 Vercel 或 COS+CDN
-```
+源码包含一组仅允许本机或局域网访问的管理接口（`LocalIpGuard`），提供用户、统计、突击检查和 AI 配置能力。仓库不提供启动位置、端口映射或访问入口说明。
 
 ## 开源许可
 

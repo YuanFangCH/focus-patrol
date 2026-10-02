@@ -19,27 +19,19 @@ npm ci
 # 开发模式
 npm run dev                       # http://localhost:3000
 
-# 生产模式（本机部署使用）
+# 构建校验
 npm run build
-npm start                         # 主站 3000
 ```
 
-管理面板与主站共用同一份构建产物，单独用另一个进程启动：
-
-```powershell
-node node_modules\next\dist\bin\next start -H 127.0.0.1 -p 3002
-# 打开 http://127.0.0.1:3002/admin
-```
-
-本机部署时建议直接使用根目录的 `scripts/start-all.bat`，它会同时拉起后端、主站、管理面板和反向代理，并带崩溃自愈。
+本仓库不提供生产启动、进程守护或部署说明。
 
 ## 环境变量
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
-| `NEXT_PUBLIC_API_BASE` | `http://localhost:3001` | API 基址；设为 `/` 表示同源，由反向代理转发 |
+| `NEXT_PUBLIC_API_BASE` | `http://localhost:3001` | API 基址；设为 `/` 表示同源 |
 
-默认情况下 `next.config.js` 会把浏览器发往 `/api/*` 的请求 rewrite 到 `http://127.0.0.1:3001`。经 `proxy.js`（8888）部署时，将 `.env.production.example` 复制为 `.env.production` 并使用 `NEXT_PUBLIC_API_BASE=/`。
+默认情况下 `next.config.js` 会把浏览器发往 `/api/*` 的请求 rewrite 到 `http://127.0.0.1:3001`。
 
 ## 目录结构
 
@@ -60,7 +52,7 @@ components/
 ├─ camera/               # 摄像头预览与抓帧
 ├─ honor/                # 荣誉卡片
 ├─ social/               # 好友面板
-├─ admin/                # 用户管理、进程控制、AI 配置
+├─ admin/                # 用户管理与 AI 配置
 └─ common/               # 心跳、突击检查轮询等运行时组件
 lib/
 ├─ api/                  # 统一请求封装与各模块接口
@@ -75,10 +67,10 @@ lib/
 | `/` | 产品首页 |
 | `/login` | 输入管理员分发的 8 位 uid 登录 |
 | `/app` | 专注工作台，未登录会依次尝试 IP 免登、记住的 uid，失败后跳登录页 |
-| `/admin` | 管理面板，仅允许本机/局域网 Host，公网访问会重定向回首页 |
+| `/admin` | 管理面板，仅允许本机/局域网 Host |
 | `/guide`、`/faq`、`/privacy`、`/privacy-camera`、`/updates` | 说明类页面 |
 
-`middleware.ts` 会对 `/admin/:path*` 做 Host 校验；`proxy.js` 还会在网络层拦截 `/api/admin/*`，两层保护不要删。
+`middleware.ts` 会对 `/admin/:path*` 做 Host 校验。
 
 ## 巡查与计时链路
 
@@ -93,6 +85,5 @@ lib/
 
 - **改了接口地址不生效**：`NEXT_PUBLIC_*` 在构建时写入产物，修改后需重新 `npm run build`。
 - **生产页面样式异常**：先删除 `.next` 重新构建，再确认 Tailwind 配置未被覆盖。
-- **dev 模式在受限环境不可用**：某些受管环境可能限制临时文件清理，部署时统一使用 `npm run build` + `next start`。
-- **管理面板打不开**：使用 `http://127.0.0.1:3002/admin`，并确认管理进程由 `-H 127.0.0.1` 启动。
-- **API 请求 502**：确认后端 `3001` 已启动；使用相对路径时还要确认反向代理或 rewrite 生效。
+- **dev 模式在受限环境不可用**：某些受管环境可能限制临时文件清理，可用 `npm run build` 做静态校验。
+- **API 请求失败**：确认后端已启动，或检查 `NEXT_PUBLIC_API_BASE` 和 rewrite 配置。

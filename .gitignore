@@ -37,3 +37,12 @@ Thumbs.db
 
 # 内部交接文档
 HANDOFF.md
+
+# 本地部署资料(保留本机副本,不发布)
+/.env.example
+/backend/Dockerfile
+/docker-compose.yml
+/frontend/.env.production.example
+/installers/
+/proxy.js
+/scripts/

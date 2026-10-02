@@ -1,6 +1,6 @@
 'use client';
 
-/** 管理面板主页: Tab = 用户管理 / 服务控制 / AI 配置 */
+/** 管理面板主页: Tab = 用户管理 / AI 配置 */
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -9,11 +9,10 @@ import UserTable from '@/components/admin/UserTable';
 import UserSearchBar from '@/components/admin/UserSearchBar';
 import CreateUsersForm from '@/components/admin/CreateUsersForm';
 import UserDetailDrawer from '@/components/admin/UserDetailDrawer';
-import ProcessPanel from '@/components/admin/ProcessPanel';
 import AiConfigPanel from '@/components/admin/AiConfigPanel';
 
 const SIZE = 20;
-type Tab = 'users' | 'processes' | 'ai';
+type Tab = 'users' | 'ai';
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>('users');
@@ -130,7 +129,6 @@ export default function AdminPage() {
 
   const tabs: Array<{ key: Tab; label: string }> = [
     { key: 'users', label: '用户管理' },
-    { key: 'processes', label: '服务控制' },
     { key: 'ai', label: 'AI 配置' },
   ];
 
@@ -245,12 +243,6 @@ export default function AdminPage() {
           </>
         )}
 
-        {tab === 'processes' && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-5">
-            <ProcessPanel />
-          </div>
-        )}
-
         {tab === 'ai' && (
           <div className="bg-white rounded-2xl border border-slate-200 p-5">
             <AiConfigPanel />
@@ -258,7 +250,7 @@ export default function AdminPage() {
         )}
 
         <p className="text-xs text-slate-300 text-center">
-          管理接口仅监听本机(LocalIpGuard),公网隧道访问 /api/admin/* 会被拒绝
+          管理接口仅允许本机或局域网访问(LocalIpGuard)
         </p>
       </div>
 

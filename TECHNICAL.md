@@ -4,7 +4,7 @@
 > 本文档对应的是一份**未完工的废案**，仅用于记录当时的实现思路与代码结构。
 > 文档内容可能与代码不一致，未经验证，**不具备任何实际价值**，不应作为部署或生产环境依据。
 
-> 技术深度文档：架构、模块、路由、实体、全局机制、AI 判定链路、巡查链路、部署。
+> 技术深度文档：架构、模块、路由、实体、全局机制、AI 判定链路与巡查链路。
 > 快速上手与组件说明见仓库根目录 `README.md`。
 
 ---
@@ -19,7 +19,7 @@
 | 前端 | Next.js App Router + React + TypeScript + Tailwind CSS + zustand | next 14.2 / react 18 / zustand 4 |
 | 后端 | NestJS + TypeORM + JWT + class-validator | nest 10 / typeorm |
 | 数据库 | SQL.js (WASM 内存库，默认，零安装) | sql.js |
-| 生产数据库 | PostgreSQL 16（`DB_TYPE=postgres` 切换） | pg |
+| 可选数据库 | PostgreSQL 16（`DB_TYPE=postgres` 切换） | pg |
 | 认证 | JWT access + refresh 轮换 | @nestjs/jwt |
 | AI 判定 | 多商家视觉路由（GLM 免费优先） | HttpService 手写 OpenAI 兼容 |
 
@@ -29,7 +29,7 @@
 
 ```
 focus-patrol/
-├─ backend/               NestJS 后端（端口 3001）
+├─ backend/               NestJS 后端
 │  ├─ src/
 │  │  ├─ main.ts          应用入口：前缀/cors/pipe/拦截器/过滤器
 │  │  ├─ app.module.ts    模块、数据库、限流与调度装配
@@ -38,18 +38,12 @@ focus-patrol/
 │  │  ├─ modules/         业务模块（见 §3）
 │  │  ├─ vision/          AI 判定抽象层（见 §6）
 │  ├─ scripts/            CLI 工具（建号）
-│  ├─ data/               本地 SQL.js 数据库（gitignored）
-│  ├─ uploads/            本地巡查图片（gitignored）
 │  └─ .env.example        环境变量示例
-├─ frontend/              Next.js 前端（端口 3000，管理面板 3002）
+├─ frontend/              Next.js 前端
 │  ├─ app/                App Router 页面
 │  ├─ components/         组件（番茄钟/巡查/管理/摄像头/荣誉…）
-│  ├─ lib/                api 封装 / zustand store / 指纹+巡查引擎
-│  └─ .env.production.example 生产构建同源 API 示例
-├─ proxy.js               本地反向代理（端口 8888）
-├─ docker-compose.yml     PG+Redis+API+Adminer 编排
-├─ scripts/               运维批处理（start-all/backup/register-tasks）
-└─ backups/ logs/ .pids/  本地运行数据（gitignored）
+│  └─ lib/                api 封装 / zustand store / 指纹+巡查引擎
+└─ README.md / TECHNICAL.md / LICENSE / SECURITY.md
 ```
 
 ---
@@ -132,8 +126,6 @@ focus-patrol/
 | GET | `/admin/stats` | 全局统计 |
 | POST/GET | `/admin/patrol/spot/:userId` | 发起/历史突击检查 |
 | GET/DELETE | `/admin/patrol/spot/:userId/image` | 突击原图查看(StreamableFile)/删除 |
-| GET | `/admin/processes/status` | 四进程状态 |
-| POST | `/admin/processes/start\|stop\|restart\|stop-all` | 进程控制 |
 
 ### 3.10 ai-config（AI 厂商配置，LocalIpGuard + @Public）
 | 方法 | 路径 | 说明 |
@@ -171,7 +163,7 @@ focus-patrol/
 
 ### 5.1 main.ts
 - `setGlobalPrefix('api')`
-- `trust proxy = 'loopback'`（经 getHttpAdapter().getInstance().set），只信本机一跳，防公网伪造 XFF
+- `trust proxy = 'loopback'`（经 getHttpAdapter().getInstance().set），只信本机一跳，防不可信来源伪造 XFF
 - CORS：读 `CORS_ORIGINS`（逗号分隔白名单），未设则全放开 + credentials
 - 全局 `ValidationPipe({ whitelist, transform })`
 - 全局 `TransformInterceptor`：统一 `{ code:0, data, message }`；**`data instanceof StreamableFile` 返回原样不包装**（否则图片流被 JSON 化看不了）
@@ -247,41 +239,14 @@ focus-patrol/
 
 ---
 
-## 9. 部署与运维
-
-### 9.1 本机四服务（SakuraFrp 方案）
-| 服务 | 端口 | 命令 |
-|---|---|---|
-| 后端 | 3001 | `cd backend && node dist/main.js` |
-| 前端主站 | 3000 | `cd frontend && node node_modules/next/dist/bin/next start -p 3000` |
-| 管理面板 | 3002 | `cd frontend && node .../next start -H 127.0.0.1 -p 3002`（仅本机） |
-| 反代 | 8888 | `node proxy.js` |
-
-- 免手动：`scripts/start-all.bat`（含崩溃自愈循环）、`register-tasks.bat`（任务计划）、`backup.bat`（每日备份保留 7 份）。
-- **proxy.js**：`/api/*`→3001，其余→3000，**`/api/admin/*` 一律 403**（防 LocalIpGuard 被隧道穿透）。
-- **修改后端必须 `nest build` 再重启**（跑的是 dist 产物，非 ts 源码）。
-
-### 9.2 前端生产构建
-- **部分受管环境会限制 `next dev` 的临时文件操作** → 部署统一用 `next build` + `next start` 生产模式。
-- `next.config.js` 必须有 rewrites 代理 `/api/*→3001`（否则 3000 直连 /api 404）。
-- 将 `.env.production.example` 复制为 `.env.production` 并设 `NEXT_PUBLIC_API_BASE=/`（同源），client.ts 用 fetch + BASE_PREFIX。
-- 管理面板 3002 的 admin.ts **硬编码直连 `127.0.0.1:3001/api/admin`，不带 JWT**（设计意图，需管理面板与本机同机）。
-
-### 9.3 数据库
-- `DB_TYPE=sqlite`（sqljs，文件 `backend/data/aidushu.sqlite`，零安装）／`postgres`（DATABASE_URL）。
-- **sqljs 内存库覆盖**：后端运行期间直接改 sqlite 文件不生效且会被 autoSave 覆盖 → 数据变更**必须走后端接口/进程内操作**。
-- 改 sqljs 数据需**先停后端**再改文件、重启生效。
-
-### 9.4 环境变量
-复制 `backend/.env.example` 为 `backend/.env` 后按需修改：
-`NODE_ENV / PORT / DB_TYPE / DB_FILE / REDIS_HOST / REDIS_PORT / JWT_SECRET / JWT_REFRESH_SECRET / UPLOAD_DIR / SMS_PROVIDER / AI_PROVIDER`
-
-### 9.5 回归测试（后端启动后）
+## 9. 回归测试（后端启动后）
 ```
 cd backend && node test-m2.mjs      # 巡查全链路
 cd backend && node test-m3.mjs      # 荣誉/好友/心跳/通知（20 项）
 cd backend && node e2e-patrol.mjs   # 端到端巡查
 ```
+
+> 本仓库不提供部署、反向代理、进程守护、备份或公网发布说明。
 
 ---
 

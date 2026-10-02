@@ -11,7 +11,7 @@ import { User } from '../../entities/user.entity';
  * - ping: 更新 lastSeen 时间戳,并刷新 user.last_active_at
  * - 在线判定: lastSeen 距今 < 30s
  * - leave: 清除记录
- * - 多实例部署时需换 Redis(TrackService 接口不变)
+ * - 多实例运行时需换 Redis(TrackService 接口不变)
  */
 @Injectable()
 export class TrackService {

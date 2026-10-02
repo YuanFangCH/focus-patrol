@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
-import { ProcessManagerService } from './process-manager.service';
 import { LocalIpGuard } from './local-ip.guard';
 import { TrackModule } from '../track/track.module';
 import { PatrolModule } from '../patrol/patrol.module';
@@ -27,6 +26,6 @@ import { Achievement } from '../../entities/achievement.entity';
     PatrolModule,
   ],
   controllers: [AdminController],
-  providers: [AdminService, ProcessManagerService, LocalIpGuard],
+  providers: [AdminService, LocalIpGuard],
 })
 export class AdminModule {}

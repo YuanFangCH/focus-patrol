@@ -1,8 +1,6 @@
 /**
  * 管理面板 API 封装
- * 管理接口仅本机/局域网可调(LocalIpGuard),且 proxy 对 /api/admin/* 403 拦截,
- * 故这里硬编码直连后端 127.0.0.1:3001(不走反代、不带 JWT)。
- * 管理面板部署在独立进程 3002(仅 127.0.0.1),浏览器为本机,可直连。
+ * 管理接口仅本机/局域网可调(LocalIpGuard),这里直连本机后端且不携带 JWT。
  */
 
 const ADMIN_BASE = 'http://127.0.0.1:3001/api/admin';
@@ -174,31 +172,6 @@ export const adminApi = {
   spotDeleteImage: (userId: string, taskId: string) =>
     raw<{ ok: boolean }>(`/patrol/spot/${userId}/image?taskId=${taskId}`, { method: 'DELETE' }),
 
-  // ---------- 进程控制 ----------
-
-  processStatus: () => raw<{ list: ProcessStatus[] }>('/processes/status'),
-
-  processStart: (name: string) =>
-    raw<{ name: string; started: boolean }>('/processes/start', {
-      method: 'POST',
-      body: JSON.stringify({ name }),
-    }),
-
-  processStop: (name: string) =>
-    raw<{ name: string; stopped: boolean }>('/processes/stop', {
-      method: 'POST',
-      body: JSON.stringify({ name }),
-    }),
-
-  processRestart: (name: string) =>
-    raw<{ name: string; restarting: boolean }>('/processes/restart', {
-      method: 'POST',
-      body: JSON.stringify({ name }),
-    }),
-
-  processStopAll: () =>
-    raw<Record<string, unknown>>('/processes/stop-all', { method: 'POST' }),
-
   // ---------- AI 配置 ----------
 
   listAiConfig: () => raw<AiConfigEntry[]>('/ai-config'),
@@ -212,13 +185,6 @@ export const adminApi = {
       body: JSON.stringify(patch),
     }),
 };
-
-export interface ProcessStatus {
-  name: string;
-  port: number;
-  running: boolean;
-  pid: number | null;
-}
 
 export interface AiConfigEntry {
   provider: string;

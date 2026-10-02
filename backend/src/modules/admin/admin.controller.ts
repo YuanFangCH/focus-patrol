@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards, StreamableFile } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { ProcessManagerService } from './process-manager.service';
 import { PatrolService } from '../patrol/patrol.service';
 import { LocalIpGuard } from './local-ip.guard';
 import { Public } from '../../common/decorators/public.decorator';
@@ -16,7 +15,6 @@ import { SpotImageViewQueryDto } from '../patrol/dto/patrol.dto';
 export class AdminController {
   constructor(
     private readonly admin: AdminService,
-    private readonly procs: ProcessManagerService,
     private readonly patrols: PatrolService,
   ) {}
 
@@ -98,37 +96,5 @@ export class AdminController {
   @Delete('patrol/spot/:userId/image')
   spotDeleteImage(@Param('userId') userId: string, @Query() q: SpotImageViewQueryDto) {
     return this.patrols.deleteSpotImage(userId, q.taskId);
-  }
-
-  // ---------- 进程控制(启停本项目 4 个服务) ----------
-
-  /** 进程状态列表 */
-  @Get('processes/status')
-  procStatus() {
-    return this.procs.status();
-  }
-
-  /** 启动进程 */
-  @Post('processes/start')
-  procStart(@Body('name') name: string) {
-    return this.procs.start(name);
-  }
-
-  /** 停止进程(api 为延迟自杀) */
-  @Post('processes/stop')
-  procStop(@Body('name') name: string) {
-    return this.procs.stop(name);
-  }
-
-  /** 重启进程(api 走守护脚本) */
-  @Post('processes/restart')
-  procRestart(@Body('name') name: string) {
-    return this.procs.restart(name);
-  }
-
-  /** 一键全停 */
-  @Post('processes/stop-all')
-  procStopAll() {
-    return this.procs.stopAll();
   }
 }

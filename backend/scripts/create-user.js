@@ -3,7 +3,7 @@
  * 管理 CLI:创建账号并生成唯一 uid(8 位短码)
  *
  * 通过本机管理接口 POST /api/admin/users 创建(LocalIpGuard 仅允许本机/局域网 IP,
- * 公网不可调用,符合"仅后端添加账号")。
+ * 非本机/局域网请求不可调用,符合"仅后端添加账号")。
  *
  * 用法(在 backend 目录下执行,需后端已启动):
  *   node scripts/create-user.js --nickname 小明              # 建 1 个
