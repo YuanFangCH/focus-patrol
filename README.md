@@ -1,4 +1,11 @@
-# AI 督学馆
+# AI 督学馆（未完工废案）
+
+> [!WARNING]
+> 本项目是一份**未完工的废案**。代码、文档与设计均不完整，未经过完整验证，**不具备任何实际价值**，不建议部署或用于生产环境。本仓库仅作为历史记录和参考材料保留，不提供维护、支持或后续更新承诺。
+>
+> This repository is an **unfinished, abandoned draft**. It is incomplete,
+> unverified, and has **no practical value**. It is preserved for reference
+> only and is not intended for deployment or production use.
 
 番茄钟 + AI 视觉巡查 + 荣誉与社交体系的专注训练应用。
 
