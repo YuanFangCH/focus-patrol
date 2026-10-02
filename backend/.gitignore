@@ -1,0 +1,14 @@
+# dependencies
+/node_modules
+
+# build
+/dist
+/data
+/uploads
+
+# env
+.env
+!.env.example
+
+# logs
+*.log

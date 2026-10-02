@@ -1,0 +1,39 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+.next/
+out/
+**/tsconfig.tsbuildinfo
+
+# 数据库文件
+backend/data/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# 上传文件
+backend/uploads/
+
+# 环境变量
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.production.example
+
+# 运行数据
+backups/
+logs/
+.pids/
+
+# 日志
+*.log
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 内部交接文档
+HANDOFF.md
