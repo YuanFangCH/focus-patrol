@@ -1,9 +1,5 @@
 # AI 督学馆
 
-> [!WARNING]
-> 历史参考项目，不再维护。
-> 代码和文档可能不完整，请勿用于生产环境。
-
 番茄钟 + AI 视觉巡查 + 荣誉与社交体系的专注训练应用。
 
 ## 文档导航
@@ -12,9 +8,6 @@
 - [backend/README.md](./backend/README.md)：后端启动、环境变量、接口与测试
 - [frontend/README.md](./frontend/README.md)：前端页面、巡查链路与构建排错
 
-## 运行范围
-
-本仓库只保留应用源码与有限的开发参考说明，**不包含任何本地部署、反向代理、进程守护、自动备份、公网发布或生产运行资料**。
 
 ## 技术栈
 
@@ -42,11 +35,10 @@ npm run dev
 
 ## 认证方式(唯一 uid 登录)
 
-1. 管理员建号:`cd backend && node scripts/create-user.js --nickname 小明 --count 5`(仅本机可调,经 `POST /api/admin/users`)
-2. 建号后输出 8 位 uid(如 `A7K9Q2M4`),分发给用户
-3. 用户在前端登录页输入 uid 即可登录(uid 即凭证,无密码)
-4. 已废弃:手机号验证码登录、游客登录(接口已移除)
-5. 登录限流:`POST /auth/login` 10 次/分/IP,防 uid 暴力枚举
+管理员建号:`cd backend && node scripts/create-user.js --nickname 小明 --count 5`(仅本机可调,经 `POST /api/admin/users`)
+建号后输出 8 位 uid分发给用户
+用户在前端登录页输入 uid 即可登录(无密码)
+登录限流:`POST /auth/login` 10 次/分/IP,防 uid 暴力枚举
 
 ## 环境变量
 
@@ -99,11 +91,6 @@ frontend/
 - 通知:好友申请/同意等事件写入通知中心,支持单条已读/全部已读
 - 回归测试:`cd backend && node test-m3.mjs`(需后端已启动)
 
-## 里程碑进度
-
-- [x] M1 认证 + 番茄钟(uid 登录、会话落库、得分结算)
-- [x] M2 AI 巡查(本地指纹预筛 + /patrols/evaluate + 违纪快照 + 督学官 UI)
-- [x] M3 荣誉 + 社交(加分升段 + 勋章 + 好友互关 + 在线心跳 + 通知)
 
 ## 管理接口
 
@@ -111,4 +98,4 @@ frontend/
 
 ## 开源许可
 
-本项目采用 [MIT License](./LICENSE)。请勿提交 `.env`、本地数据库、用户上传图片、日志或备份；安全和凭据处理说明见 [SECURITY.md](./SECURITY.md)。
+本项目采用 [MIT License](./LICENSE)。
