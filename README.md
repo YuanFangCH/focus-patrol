@@ -9,12 +9,7 @@
 - [frontend/README.md](./frontend/README.md)：前端页面、巡查链路与构建排错
 
 
-## 技术栈
 
-- **前端**:Next.js 14 (App Router) + React 18 + TypeScript + Tailwind CSS v3 + zustand + PWA
-- **后端**:NestJS 10 + TypeORM + JWT (access 15min / refresh 30d 旋转)
-- **数据库**:默认 SQL.js(WASM,零安装零编译,文件 `backend/data/aidushu.sqlite`);可选 PostgreSQL(改 `DB_TYPE=postgres`)
-- **AI 判定**:抽象层 `IFocusVisionProvider`,开发期 Mock 厂商
 
 ## 快速开始
 
